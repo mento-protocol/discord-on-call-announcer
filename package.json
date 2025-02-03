@@ -1,0 +1,42 @@
+{
+  "name": "discord-oncall-announcer",
+  "version": "1.0.0",
+  "description": "Cloud Function to manage on-call rotations via VictorOps and Discord",
+  "main": "dist/index.js",
+  "engines": {
+    "node": "^22.13.1",
+    "pnpm": "^9.15.5"
+  },
+  "scripts": {
+    "build": "tsc -p .",
+    "deploy": "npm run deploy:function && npm run deploy:scheduler",
+    "predeploy:function": "npx dotenv-to-yaml .env .env.yaml",
+    "deploy:function": "gcloud functions deploy handle-oncall-rotation --project mento-prod --runtime nodejs22 --trigger-topic oncall-rotation --region europe-west1 --env-vars-file .env.yaml",
+    "deploy:scheduler": "gcloud scheduler jobs create pubsub daily-pr-summary-job --project mento-prod --schedule \"0 10 * * *\" --topic daily-pr-summary --message-body \"Run daily PR summary\"",
+    "dev": "nodemon --watch src --watch .env --watch tsconfig.json --watch pnpm-lock.yaml --ext ts,yaml,json --exec 'npm run start'",
+    "format": "trunk fmt -all",
+    "lint": "trunk check --all",
+    "logs": "./bin/get-logs.sh",
+    "logs:url": "./bin/get-logs-url.sh",
+    "prestart": "npm run build",
+    "start": "NODE_ENV=development functions-framework --target=handleOncallRotation",
+    "test": "npm run test:local",
+    "test:local": "curl localhost:8080",
+    "test:prod": "gcloud pubsub topics publish handle-oncall-rotataion --message \"Test message\" --project mento-prod"
+  },
+  "dependencies": {
+    "@google-cloud/functions-framework": "^3.4.5",
+    "axios": "^1.7.9",
+    "discord.js": "^14.17.3",
+    "dotenv": "^16.4.7",
+    "env-schema": "^6.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.0",
+    "@typescript-eslint/eslint-plugin": "^8.22.0",
+    "@typescript-eslint/parser": "^8.22.0",
+    "eslint": "^9.19.0",
+    "nodemon": "^3.1.9",
+    "typescript": "^5.7.3"
+  }
+}
