@@ -1,18 +1,19 @@
 {
-  "name": "discord-oncall-announcer",
+  "name": "discord-on-call-announcer",
   "version": "1.0.0",
   "description": "Cloud Function to manage on-call rotations via VictorOps and Discord",
   "main": "dist/index.js",
   "engines": {
-    "node": "^22.13.1",
+    "node": "^22.13.0",
     "pnpm": "^9.15.5"
   },
   "scripts": {
     "build": "tsc -p .",
-    "deploy": "npm run deploy:function && npm run deploy:scheduler",
+    "deploy": "npm run deploy:topic && npm run deploy:function && npm run deploy:scheduler",
     "predeploy:function": "npx dotenv-to-yaml .env .env.yaml",
-    "deploy:function": "gcloud functions deploy handle-oncall-rotation --project mento-prod --runtime nodejs22 --trigger-topic oncall-rotation --region europe-west1 --env-vars-file .env.yaml",
-    "deploy:scheduler": "gcloud scheduler jobs create pubsub daily-pr-summary-job --project mento-prod --schedule \"0 10 * * *\" --topic daily-pr-summary --message-body \"Run daily PR summary\"",
+    "deploy:topic": "gcloud pubsub topics describe oncall-rotation --project mento-prod || gcloud pubsub topics create oncall-rotation --project mento-prod",
+    "deploy:function": "gcloud functions deploy handle-oncall-rotation --project mento-prod --runtime nodejs22 --entry-point handleOncallRotation --trigger-topic oncall-rotation --region europe-west1 --env-vars-file .env.yaml",
+    "deploy:scheduler": "gcloud scheduler jobs create pubsub oncall-rotation-job --project mento-prod --schedule \"0 11 * * 1\" --topic oncall-rotation --message-body \"Run weekly oncall rotation\" --time-zone \"Europe/Berlin\" --location europe-west1",
     "dev": "nodemon --watch src --watch .env --watch tsconfig.json --watch pnpm-lock.yaml --ext ts,yaml,json --exec 'npm run start'",
     "format": "trunk fmt -all",
     "lint": "trunk check --all",
@@ -22,11 +23,10 @@
     "start": "NODE_ENV=development functions-framework --target=handleOncallRotation",
     "test": "npm run test:local",
     "test:local": "curl localhost:8080",
-    "test:prod": "gcloud pubsub topics publish handle-oncall-rotataion --message \"Test message\" --project mento-prod"
+    "test:prod": "gcloud pubsub topics publish oncall-rotation --message \"Test\" --project mento-prod"
   },
   "dependencies": {
     "@google-cloud/functions-framework": "^3.4.5",
-    "axios": "^1.7.9",
     "discord.js": "^14.17.3",
     "dotenv": "^16.4.7",
     "env-schema": "^6.0.1"
@@ -38,5 +38,10 @@
     "eslint": "^9.19.0",
     "nodemon": "^3.1.9",
     "typescript": "^5.7.3"
+  },
+  "pnpm": {
+    "overrides": {
+      "undici": "^6.21.1"
+    }
   }
 }
