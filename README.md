@@ -88,6 +88,67 @@ To manually trigger the deployed function in production, run:
 pnpm test:prod
 ```
 
+## Managing Team Members
+
+### Adding New Team Members
+
+To add a new team member to the on-call rotation:
+
+1. **Add the mapping in the config file** ([`src/config.ts`](src/config.ts)):
+
+   ```typescript
+   victoropsToDiscordUsernames: {
+     // VictorOps username -> Discord ID
+     'new.member.victorops': '123456789012345678', // Discord display name
+     // ... existing mappings
+   }
+   ```
+
+2. **Get the Discord User ID**:
+
+   - Enable Developer Mode in Discord (User Settings → Advanced → Developer Mode)
+   - Right-click on the user's name and select "Copy User ID"
+
+3. **Get the VictorOps username**:
+
+   - Check the [VictorOps dashboard](https://portal.victorops.com/dash/mento-labs-gmbh#/users)
+
+4. **Deploy the changes**:
+
+   ```sh
+   pnpm deploy:function
+   ```
+
+### Removing Team Members
+
+To remove a team member from the on-call rotation:
+
+1. **Remove the mapping** from [`src/config.ts`](src/config.ts):
+
+   ```typescript
+   victoropsToDiscordUsernames: {
+     // Remove the line for the team member
+     // 'old.member.victorops': '123456789012345678', // Remove this line
+     // ... keep other mappings
+   }
+   ```
+
+2. **Deploy the changes**:
+
+   ```sh
+   pnpm deploy:function
+   ```
+
+### Important Notes
+
+- **VictorOps Configuration**: Make sure the team member is properly configured in VictorOps with the correct username that matches the mapping
+- **Discord Permissions**: The bot needs permission to assign/remove the support role from users
+- **Testing**: After adding/removing members, test the function to ensure it works correctly:
+
+  ```sh
+  pnpm test:prod
+  ```
+
 ## Checking the logs
 
 To view the last logs in your local terminal, run:

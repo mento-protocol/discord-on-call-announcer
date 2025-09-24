@@ -50,6 +50,7 @@ export const config: Config = {
     channelId: env.DISCORD_CHANNEL_ID,
     supportRoleId: env.DISCORD_SUPPORT_ROLE_ID,
   },
+  // Get the VictorOps username from https://portal.victorops.com/dash/mento-labs-gmbh#/users
   victoropsToDiscordUsernames: {
     // VictorOps username -> Discord ID
     baran: '141140845410648064', // baran
@@ -58,7 +59,7 @@ export const config: Config = {
     xyznelson: '507724676374593566', // nelson
     philbow61: '290529861204836352', // philip I
     chapati: '241484115000426496', // philip II
-    'ryan.noble.mento': '487208939084185601', // ryan
+    mouradmento: '207241096642691072',
   },
   victorops: {
     apiId: env.VICTOROPS_API_ID,
