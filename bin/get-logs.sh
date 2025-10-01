@@ -33,3 +33,5 @@ end'
 }
 
 get_function_logs "$@"
+
+./bin/get-logs-url.sh

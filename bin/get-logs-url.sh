@@ -37,7 +37,7 @@ EOF
 
 	printf '\n\033[1mLogs Explorer URL\033[0m - Your function logs in the GCP Logs Explorer, usually this is what you want.\n%s\n' "${logs_explorer_url}"
 
-	function_logs_url="https://console.cloud.google.com/functions/details/${region}/${function_name}?project=${project_id}&tab=logs "
+	function_logs_url="https://console.cloud.google.com/run/detail/${region}/${function_name}/observability/logs?project=${project_id}"
 	printf '\n\033[1mCloud Function Logs\033[0m - A simplified logs view..\n%s\n' "${function_logs_url}"
 }
 
