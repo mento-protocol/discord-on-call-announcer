@@ -3,16 +3,30 @@
 A Google Cloud Function that announces when a new support engineer is on-call and updates the @SupportEngineer role in Discord.
 
 - [Prerequisites](#prerequisites)
+- [Discord Bot Setup](#discord-bot-setup)
 - [Setup](#setup)
 - [Running the function locally](#running-the-function-locally)
 - [Deployment](#deployment)
 - [Testing the function in production](#testing-the-function-in-production)
+- [Managing Team Members](#managing-team-members)
 - [Checking the logs](#checking-the-logs)
 
 ## Prerequisites
 
 - Node.js (>=22.x)
 - pnpm (>=9.x)
+- Discord server with admin permissions
+- VictorOps account with API access
+
+## Discord Bot Setup
+
+If you need to set up a new Discord bot, follow the detailed guide in [DISCORD_BOT_SETUP.md](DISCORD_BOT_SETUP.md).
+
+**Quick Reference:**
+
+- Bot needs **Manage Roles** permission
+- Bot's role must be positioned **above** @SupportEngineer role in server hierarchy
+- Required environment variables: `DISCORD_BOT_TOKEN`, `DISCORD_CHANNEL_ID`, `DISCORD_SUPPORT_ROLE_ID`
 
 ## Setup
 
@@ -142,7 +156,9 @@ To remove a team member from the on-call rotation:
 ### Important Notes
 
 - **VictorOps Configuration**: Make sure the team member is properly configured in VictorOps with the correct username that matches the mapping
-- **Discord Permissions**: The bot needs permission to assign/remove the support role from users
+- **Discord Bot Setup**: Ensure you've completed the [Discord Bot Setup](#discord-bot-setup) section, especially the role hierarchy configuration
+- **Bot Permissions**: The bot needs the "Manage Roles" permission and must be positioned above the @SupportEngineer role in the server hierarchy
+- **Troubleshooting**: For common Discord bot issues, see the [troubleshooting guide](DISCORD_BOT_SETUP.md#troubleshooting)
 - **Testing**: After adding/removing members, test the function to ensure it works correctly:
 
   ```sh
