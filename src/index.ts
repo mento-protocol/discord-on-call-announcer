@@ -1,4 +1,4 @@
-import { HttpFunction, Request, Response } from '@google-cloud/functions-framework'
+import { CloudEvent } from '@google-cloud/functions-framework'
 import { Client, GatewayIntentBits, Guild, PermissionsBitField, Role, TextChannel } from 'discord.js'
 import { config } from './config'
 import { DiscordError, VictorOpsError } from './errors'
@@ -8,7 +8,7 @@ const discordClient = new Client({
   intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers],
 })
 
-export const handleOncallRotation: HttpFunction = async (req: Request, res: Response): Promise<void> => {
+export const handleOncallRotation = async (cloudEvent: CloudEvent<unknown>): Promise<void> => {
   try {
     // 1. Fetch current on-call engineer from VictorOps
     const discordUserId = await getCurrentOncallEngineer()
@@ -37,11 +37,11 @@ export const handleOncallRotation: HttpFunction = async (req: Request, res: Resp
     // 9. Add role to new on-call engineer
     await assignRoleToMember(guild, supportRole, discordUserId)
 
-    // 10. Send success response
-    res.status(200).send('Succesfully handled on-call rotation')
+    // 10. Log success
+    console.log('Successfully handled on-call rotation to ', discordUserId)
   } catch (error) {
     console.error('Error in handleOncallRotation:', error)
-    res.status(500).send('Failed to handle on-call rotation.')
+    throw error // Re-throw to let Cloud Functions handle the error
   } finally {
     // 11. Cleanup
     discordClient.destroy()
